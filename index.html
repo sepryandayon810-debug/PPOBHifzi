@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PPOB App Mockup</title>
+    <style>
+        :root {
+            --primary: #1a1a2e;
+            --secondary: #16213e;
+            --accent: #0f3460;
+            --success: #16a34a;
+            --danger: #dc2626;
+            --warning: #ca8a04;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background: var(--bg); color: var(--text); }
+        
+        /* Layout */
+        .app { display: flex; min-height: 100vh; }
+        .sidebar { width: 260px; background: var(--primary); color: white; padding: 20px; }
+        .sidebar h2 { margin-bottom: 30px; font-size: 20px; }
+        .nav-item { padding: 12px 16px; margin: 4px 0; border-radius: 8px; cursor: pointer; transition: 0.2s; }
+        .nav-item:hover, .nav-item.active { background: var(--accent); }
+        .main { flex: 1; padding: 30px; overflow-y: auto; }
+        
+        /* Header */
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .saldo-card { background: linear-gradient(135deg, var(--primary), var(--accent)); color: white; padding: 24px; border-radius: 16px; min-width: 300px; }
+        .saldo-card h3 { font-size: 14px; opacity: 0.8; margin-bottom: 8px; }
+        .saldo-card .amount { font-size: 32px; font-weight: bold; }
+        
+        /* Grid Produk */
+        .section-title { font-size: 20px; margin-bottom: 20px; }
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px; margin-bottom: 40px; }
+        .product-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; text-align: center; cursor: pointer; transition: all 0.2s; }
+        .product-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .product-icon { font-size: 32px; margin-bottom: 12px; }
+        .product-name { font-weight: 600; font-size: 14px; }
+        
+        /* Form Transaksi */
+        .form-container { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; max-width: 500px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 14px; }
+        .form-group input, .form-group select { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; }
+        .btn { padding: 12px 24px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn:hover { opacity: 0.9; }
+        
+        /* Riwayat */
+        .table-container { background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 14px 20px; text-align: left; border-bottom: 1px solid var(--border); font-size: 14px; }
+        th { background: var(--bg); font-weight: 600; color: var(--text-secondary); }
+        .status { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .status.success { background: #dcfce7; color: var(--success); }
+        .status.pending { background: #fef9c3; color: var(--warning); }
+        .status.failed { background: #fee2e2; color: var(--danger); }
+        
+        /* Modal */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000; }
+        .modal-overlay.active { display: flex; }
+        .modal { background: white; border-radius: 16px; padding: 32px; width: 90%; max-width: 400px; }
+        .modal h3 { margin-bottom: 20px; }
+        .detail-row { display: flex; justify-content: space-between; margin: 12px 0; font-size: 14px; }
+        .detail-row.total { font-weight: bold; font-size: 16px; border-top: 1px solid var(--border); padding-top: 12px; margin-top: 12px; }
+        
+        /* Struk */
+        .struk { background: white; border: 1px dashed #999; padding: 20px; font-family: monospace; font-size: 12px; line-height: 1.6; }
+        .struk-header { text-align: center; margin-bottom: 16px; }
+        .struk-divider { border-top: 1px dashed #999; margin: 8px 0; }
+        
+        /* Tab */
+        .tabs { display: flex; gap: 8px; margin-bottom: 24px; border-bottom: 2px solid var(--border); }
+        .tab { padding: 12px 24px; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; font-weight: 500; }
+        .tab.active { border-bottom-color: var(--primary); color: var(--primary); }
+        
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <h2>⚡ PPOB Master</h2>
+            <div class="nav-item active" onclick="showPage('dashboard')">📊 Dashboard</div>
+            <div class="nav-item" onclick="showPage('transaksi')">🛒 Transaksi</div>
+            <div class="nav-item" onclick="showPage('riwayat')">📜 Riwayat</div>
+            <div class="nav-item" onclick="showPage('deposit')">💰 Deposit</div>
+            <div class="nav-item" onclick="showPage('laporan')">📈 Laporan</div>
+            <div class="nav-item" onclick="showPage('pengaturan')">⚙️ Pengaturan</div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main">
+            <!-- Dashboard -->
+            <div id="dashboard" class="page">
+                <div class="header">
+                    <div>
+                        <h1>Dashboard</h1>
+                        <p style="color: var(--text-secondary);">Selamat datang, Admin</p>
+                    </div>
+                    <div class="saldo-card">
+                        <h3>Saldo Tersedia</h3>
+                        <div class="amount">Rp 5.250.000</div>
+                    </div>
+                </div>
+                
+                <h2 class="section-title">Menu Cepat</h2>
+                <div class="product-grid">
+                    <div class="product-card" onclick="showPage('transaksi', 'pulsa')">
+                        <div class="product-icon">📱</div>
+                        <div class="product-name">Pulsa</div>
+                    </div>
+                    <div class="product-card" onclick="showPage('transaksi', 'data')">
+                        <div class="product-icon">🌐</div>
+                        <div class="product-name">Paket Data</div>
+                    </div>
+                    <div class="product-card" onclick="showPage('transaksi', 'token')">
+                        <div class="product-icon">⚡</div>
+                        <div class="product-name">Token PLN</div>
+                    </div>
+                    <div class="product-card" onclick="showPage('transaksi', 'pln')">
+                        <div class="product-icon">💡</div>
+                        <div class="product-name">Tagihan PLN</div>
+                    </div>
+                    <div class="product-card" onclick="showPage('transaksi', 'bpjs')">
+                        <div class="product-icon">🏥</div>
+                        <div class="product-name">BPJS</div>
+                    </div>
+                    <div class="product-card" onclick="showPage('transaksi', 'pdam')">
+                        <div class="product-icon">💧</div>
+                        <div class="product-name">PDAM</div>
+                    </div>
+                    <div class="product-card" onclick="showPage('transaksi', 'internet')">
+                        <div class="product-icon">📡</div>
+                        <div class="product-name">Internet</div>
+                    </div>
+                    <div class="product-card" onclick="showPage('transaksi', 'tv')">
+                        <div class="product-icon">📺</div>
+                        <div class="product-name">TV Kabel</div>
+                    </div>
+                </div>
+
+                <h2 class="section-title">Transaksi Terakhir</h2>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Produk</th>
+                                <th>Tujuan</th>
+                                <th>Harga</th>
+                                <th>Status</th>
+                                <th>Waktu</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>TRX-001</td>
+                                <td>Pulsa Telkomsel 50K</td>
+                                <td>08123456789</td>
+                                <td>Rp 52.000</td>
+                                <td><span class="status success">Sukses</span></td>
+                                <td>28 Aug 2026, 14:30</td>
+                            </tr>
+                            <tr>
+                                <td>TRX-002</td>
+                                <td>Token PLN 100K</td>
+                                <td>1234567890</td>
+                                <td>Rp 100.000</td>
+                                <td><span class="status success">Sukses</span></td>
+                                <td>28 Aug 2026, 13:15</td>
+                            </tr>
+                            <tr>
+                                <td>TRX-003</td>
+                                <td>BPJS Kesehatan</td>
+                                <td>0001234567</td>
+                                <td>Rp 150.000</td>
+                                <td><span class="status pending">Pending</span></td>
+                                <td>28 Aug 2026, 12:00</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Transaksi -->
+            <div id="transaksi" class="page hidden">
+                <h1 class="section-title">Transaksi Baru</h1>
+                <div class="tabs">
+                    <div class="tab active" onclick="switchTab('pulsa')">Pulsa & Data</div>
+                    <div class="tab" onclick="switchTab('token')">Token PLN</div>
+                    <div class="tab" onclick="switchTab('tagihan')">Cek Tagihan</div>
+                </div>
+
+                <!-- Form Pulsa -->
+                <div id="tab-pulsa" class="tab-content">
+                    <div class="form-container">
+                        <div class="form-group">
+                            <label>Nomor HP</label>
+                            <input type="text" placeholder="08xxxxxxxxxx" id="hpNumber" onkeyup="detectOperator()">
+                            <small id="operatorInfo" style="color: var(--text-secondary); margin-top: 4px; display: block;"></small>
+                        </div>
+                        <div class="form-group">
+                            <label>Nominal</label>
+                            <select id="nominalPulsa">
+                                <option>Pilih Nominal</option>
+                                <option value="5000">Pulsa 5.000 - Rp 6.500</option>
+                                <option value="10000">Pulsa 10.000 - Rp 11.500</option>
+                                <option value="20000">Pulsa 20.000 - Rp 21.000</option>
+                                <option value="50000">Pulsa 50.000 - Rp 51.000</option>
+                                <option value="100000">Pulsa 100.000 - Rp 100.000</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" onclick="showConfirm()">Lanjutkan</button>
+                    </div>
+                </div>
+
+                <!-- Form Token -->
+                <div id="tab-token" class="tab-content hidden">
+                    <div class="form-container">
+                        <div class="form-group">
+                            <label>Nomor Meter/ID Pelanggan</label>
+                            <input type="text" placeholder="12345678901" id="meterNumber">
+                        </div>
+                        <div class="form-group">
+                            <label>Nominal Token</label>
+                            <select>
+                                <option>Token 20.000 - Rp 21.000</option>
+                                <option>Token 50.000 - Rp 51.000</option>
+                                <option>Token 100.000 - Rp 101.000</option>
+                                <option>Token 200.000 - Rp 201.000</option>
+                                <option>Token 500.000 - Rp 501.000</option>
+                                <option>Token 1.000.000 - Rp 1.001.000</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" onclick="showConfirm()">Lanjutkan</button>
+                    </div>
+                </div>
+
+                <!-- Form Cek Tagihan -->
+                <div id="tab-tagihan" class="tab-content hidden">
+                    <div class="form-container">
+                        <div class="form-group">
+                            <label>Jenis Tagihan</label>
+                            <select id="billType" onchange="changeBillForm()">
+                                <option value="pln">PLN Pascabayar</option>
+                                <option value="bpjs">BPJS Kesehatan</option>
+                                <option value="pdam">PDAM</option>
+                                <option value="internet">Internet</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label id="billLabel">Nomor Pelanggan PLN</label>
+                            <input type="text" placeholder="123456789012">
+                        </div>
+                        <button class="btn btn-primary" onclick="cekTagihan()">Cek Tagihan</button>
+                        
+                        <div id="billResult" class="hidden" style="margin-top: 20px; padding: 16px; background: #f0f9ff; border-radius: 8px; border: 1px solid #bae6fd;">
+                            <div class="detail-row"><span>Nama</span><span><b>Budi Santoso</b></span></div>
+                            <div class="detail-row"><span>Periode</span><span>Agustus 2026</span></div>
+                            <div class="detail-row"><span>Total Tagihan</span><span><b>Rp 450.000</b></span></div>
+                            <button class="btn btn-success" style="width: 100%; margin-top: 12px;" onclick="showConfirm()">Bayar Sekarang</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Riwayat -->
+            <div id="riwayat" class="page hidden">
+                <h1 class="section-title">Riwayat Transaksi</h1>
+                <div style="display: flex; gap: 12px; margin-bottom: 20px;">
+                    <input type="date" style="padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
+                    <input type="date" style="padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
+                    <select style="padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
+                        <option>Semua Status</option>
+                        <option>Sukses</option>
+                        <option>Pending</option>
+                        <option>Gagal</option>
+                    </select>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID Transaksi</th>
+                                <th>Waktu</th>
+                                <th>Tipe</th>
+                                <th>Tujuan</th>
+                                <th>Harga</th>
+                                <th>SN/Kode</th>
+                                <th>Status</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>TRX-20240828-001</td>
+                                <td>28/08/2026 14:30:22</td>
+                                <td>Pulsa Telkomsel</td>
+                                <td>08123456789</td>
+                                <td>Rp 52.000</td>
+                                <td>1234-5678-9012</td>
+                                <td><span class="status success">Sukses</span></td>
+                                <td><button class="btn" style="padding: 4px 12px; font-size: 12px;" onclick="showStruk()">Cetak</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Deposit -->
+            <div id="deposit" class="page hidden">
+                <h1 class="section-title">Deposit Saldo</h1>
+                <div class="form-container">
+                    <div class="form-group">
+                        <label>Jumlah Deposit</label>
+                        <input type="number" placeholder="100000" id="depositAmount" onkeyup="calculateDeposit()">
+                    </div>
+                    <div class="form-group">
+                        <label>Metode Pembayaran</label>
+                        <select>
+                            <option>Transfer Bank BCA</option>
+                            <option>Transfer Bank BNI</option>
+                            <option>Transfer Bank Mandiri</option>
+                            <option>QRIS</option>
+                        </select>
+                    </div>
+                    <div id="depositInfo" class="hidden" style="padding: 16px; background: #f0fdf4; border-radius: 8px; margin-bottom: 16px;">
+                        <div class="detail-row"><span>Total Bayar</span><span><b id="totalDeposit">Rp 0</b></span></div>
+                        <div class="detail-row"><span>Biaya Admin</span><span>Rp 0</span></div>
+                    </div>
+                    <button class="btn btn-primary">Buat Deposit</button>
+                </div>
+            </div>
+
+            <!-- Laporan -->
+            <div id="laporan" class="page hidden">
+                <h1 class="section-title">Laporan Transaksi</h1>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px;">
+                    <div class="saldo-card" style="background: var(--success);">
+                        <h3>Total Sukses</h3>
+                        <div class="amount">Rp 12.450.000</div>
+                        <div style="font-size: 12px; margin-top: 8px;">245 Transaksi</div>
+                    </div>
+                    <div class="saldo-card" style="background: var(--warning);">
+                        <h3>Total Pending</h3>
+                        <div class="amount">Rp 850.000</div>
+                        <div style="font-size: 12px; margin-top: 8px;">12 Transaksi</div>
+                    </div>
+                    <div class="saldo-card" style="background: var(--danger);">
+                        <h3>Total Gagal</h3>
+                        <div class="amount">Rp 200.000</div>
+                        <div style="font-size: 12px; margin-top: 8px;">3 Transaksi</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pengaturan -->
+            <div id="pengaturan" class="page hidden">
+                <h1 class="section-title">Pengaturan</h1>
+                <div class="form-container">
+                    <h3 style="margin-bottom: 16px;">Profil Agen</h3>
+                    <div class="form-group">
+                        <label>Nama Lengkap</label>
+                        <input type="text" value="Agen PPOB 001">
+                    </div>
+                    <div class="form-group">
+                        <label>No. HP</label>
+                        <input type="text" value="08123456789">
+                    </div>
+                    <div class="form-group">
+                        <label>Alamat</label>
+                        <input type="text" value="Jl. Merdeka No. 1">
+                    </div>
+                    <div class="form-group">
+                        <label>Markup Harga (%)</label>
+                        <input type="number" value="2" min="0" max="50">
+                        <small style="color: var(--text-secondary);">Keuntungan per transaksi</small>
+                    </div>
+                    <button class="btn btn-primary">Simpan Perubahan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Konfirmasi -->
+    <div class="modal-overlay" id="confirmModal">
+        <div class="modal">
+            <h3>Konfirmasi Transaksi</h3>
+            <div class="detail-row"><span>Produk</span><span id="confProduct">Pulsa Telkomsel 50K</span></div>
+            <div class="detail-row"><span>Tujuan</span><span id="confTarget">08123456789</span></div>
+            <div class="detail-row"><span>Harga</span><span id="confPrice">Rp 52.000</span></div>
+            <div class="detail-row total"><span>Total Bayar</span><span id="confTotal">Rp 52.000</span></div>
+            <div style="display: flex; gap: 12px; margin-top: 24px;">
+                <button class="btn btn-danger" style="flex: 1;" onclick="closeModal()">Batal</button>
+                <button class="btn btn-success" style="flex: 1;" onclick="processTransaction()">Bayar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Struk -->
+    <div class="modal-overlay" id="strukModal">
+        <div class="modal" style="max-width: 320px;">
+            <div class="struk">
+                <div class="struk-header">
+                    <div style="font-size: 16px; font-weight: bold;">PPOB MASTER</div>
+                    <div>Jl. Merdeka No. 1</div>
+                    <div>Telp: 08123456789</div>
+                </div>
+                <div class="struk-divider"></div>
+                <div>ID: TRX-20240828-001</div>
+                <div>Tgl: 28-08-2026 14:30:22</div>
+                <div class="struk-divider"></div>
+                <div><b>PULSA TELKOMSEL 50K</b></div>
+                <div>No: 08123456789</div>
+                <div>SN: 1234-5678-9012</div>
+                <div class="struk-divider"></div>
+                <div style="display: flex; justify-content: space-between; font-weight: bold;">
+                    <span>TOTAL</span>
+                    <span>Rp 52.000</span>
+                </div>
+                <div class="struk-divider"></div>
+                <div style="text-align: center; margin-top: 12px;">
+                    Terima Kasih<br>
+                    Struk ini adalah bukti<br>pembayaran yang sah
+                </div>
+            </div>
+            <button class="btn btn-primary" style="width: 100%; margin-top: 16px;" onclick="closeStruk()">Tutup</button>
+        </div>
+    </div>
+
+    <script>
+        function showPage(page, subtab) {
+            document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById(page).classList.remove('hidden');
+            event.target.classList.add('active');
+            
+            if (subtab) switchTab(subtab);
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+            event.target.classList.add('active');
+            document.getElementById('tab-' + tab).classList.remove('hidden');
+        }
+
+        function detectOperator() {
+            const num = document.getElementById('hpNumber').value;
+            const info = document.getElementById('operatorInfo');
+            if (num.startsWith('0811') || num.startsWith('0812') || num.startsWith('0813') || num.startsWith('0821') || num.startsWith('0822') || num.startsWith('0852') || num.startsWith('0853')) {
+                info.textContent = '✓ Terdeteksi: Telkomsel';
+                info.style.color = 'var(--success)';
+            } else if (num.startsWith('0814') || num.startsWith('0815') || num.startsWith('0816') || num.startsWith('0855') || num.startsWith('0856') || num.startsWith('0857') || num.startsWith('0858')) {
+                info.textContent = '✓ Terdeteksi: Indosat';
+                info.style.color = 'var(--success)';
+            } else if (num.startsWith('0817') || num.startsWith('0818') || num.startsWith('0819') || num.startsWith('0859') || num.startsWith('0877') || num.startsWith('0878')) {
+                info.textContent = '✓ Terdeteksi: XL';
+                info.style.color = 'var(--success)';
+            } else if (num.length > 4) {
+                info.textContent = 'Operator tidak terdeteksi';
+                info.style.color = 'var(--danger)';
+            } else {
+                info.textContent = '';
+            }
+        }
+
+        function showConfirm() {
+            document.getElementById('confirmModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('confirmModal').classList.remove('active');
+        }
+
+        function processTransaction() {
+            closeModal();
+            alert('Transaksi berhasil! Saldo telah dipotong.');
+        }
+
+        function cekTagihan() {
+            document.getElementById('billResult').classList.remove('hidden');
+        }
+
+        function changeBillForm() {
+            const type = document.getElementById('billType').value;
+            const labels = { pln: 'Nomor Pelanggan PLN', bpjs: 'No. BPJS Kesehatan', pdam: 'No. Pelanggan PDAM', internet: 'No. Pelanggan Internet' };
+            document.getElementById('billLabel').textContent = labels[type];
+            document.getElementById('billResult').classList.add('hidden');
+        }
+
+        function calculateDeposit() {
+            const amount = document.getElementById('depositAmount').value;
+            if (amount > 0) {
+                document.getElementById('depositInfo').classList.remove('hidden');
+                document.getElementById('totalDeposit').textContent = 'Rp ' + parseInt(amount).toLocaleString('id-ID');
+            }
+        }
+
+        function showStruk() {
+            document.getElementById('strukModal').classList.add('active');
+        }
+
+        function closeStruk() {
+            document.getElementById('strukModal').classList.remove('active');
+        }
+    </script>
+</body>
+</html>
